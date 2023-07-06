@@ -157,7 +157,7 @@ func  (r *responseWriter) isFromIpv6() bool {
 
 
 func (r *responseWriter) WriteHeader(statusCode int) {
-		oldURL := rawURL(req)
+		oldURL := rawURL(r.request)
 
 		// rewrites
 		if r.isFromIpv6() && len(r.rewrites) > 0 {
