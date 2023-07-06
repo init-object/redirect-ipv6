@@ -163,7 +163,7 @@ func (r *responseWriter) WriteHeader(statusCode int) {
 		if r.isFromIpv6() && len(r.rewrites) > 0 {
 			newURL := r.handleRewrites(oldURL)
 			if (oldURL != newURL) {
-				r.writer.Header().Set(locationHeader, location)
+				r.writer.Header().Set(locationHeader, newURL)
 				statusCode = 301
 			}
 		}
