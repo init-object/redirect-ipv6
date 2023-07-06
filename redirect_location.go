@@ -11,11 +11,7 @@ import (
 )
 
 const locationHeader string = "Location"
-const (
-	xRealIP        = "X-Real-Ip"
-	xForwardedFor  = "X-Forwarded-For"
-	cfConnectingIP = "Cf-Connecting-Ip"
-)
+
 // Rewrite definition of a replacement.
 type Rewrite struct {
 	Regex       string `json:"regex,omitempty" toml:"regex,omitempty" yaml:"regex,omitempty"`
@@ -135,26 +131,30 @@ func (r *responseWriter) handleRewrites(location string) string {
 }
 
 func  (r *responseWriter) isFromIpv6() bool {
-	realIP := r.request.RemoteAddr
-	forwardedIPs := strings.Split(r.request.Header.Get(xForwardedFor), ",")
-
-	for i := len(forwardedIPs) - 1; i >= 0; i-- {
-		// TODO - Check if TrimSpace is necessary
-		trimmedIP := strings.TrimSpace(forwardedIPs[i])
-		if trimmedIP != "" {
-			realIP = trimmedIP
-			break
-		}
-	}
+	realIP := ClientIP(r.request)
 	
-	if realIP == "" {
-		realIP = r.request.Header.Get(cfConnectingIP)
-	}
 	fmt.Println("realIP ", realIP)
 	return strings.Contains(realIP, ":")
 }
 
+func ClientIP(r *http.Request) string {
+	xForwardedFor := r.Header.Get("X-Forwarded-For")
+	ip := strings.TrimSpace(strings.Split(xForwardedFor, ",")[0])
+	if ip != "" {
+		return ip
+	}
 
+	ip = strings.TrimSpace(r.Header.Get("X-Real-Ip"))
+	if ip != "" {
+		return ip
+	}
+
+	if ip, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr)); err == nil {
+		return ip
+	}
+
+	return ""
+}
 
 func (r *responseWriter) WriteHeader(statusCode int) {
 		oldURL := rawURL(r.request)
