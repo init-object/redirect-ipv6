@@ -165,7 +165,7 @@ func (r *responseWriter) WriteHeader(statusCode int) {
 			newURL := r.handleRewrites(oldURL)
 			if (oldURL != newURL) {
 				r.writer.Header().Set(locationHeader, newURL)
-				statusCode = 301
+				statusCode = 302
 			}
 		}
 
