@@ -19,7 +19,7 @@ The plugin also supports the definition and handling of some rewrites. A rewrite
 ```yaml
 experimental:
   plugins:
-    redirectLocation:
+    redirectIPv6Location:
       modulename: "github.com/init-object/traefik-plugin-redirect-ipv6"
       version: "v0.0.1" #replace with newest version
 ```
