@@ -3,6 +3,7 @@ package traefik_plugin_redirect_ipv6 //nolint
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"path"
