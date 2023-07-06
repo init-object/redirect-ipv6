@@ -123,10 +123,12 @@ func (r *responseWriter) defaultHandling(location string) string {
 
 func (r *responseWriter) handleRewrites(location string) string {
 	for _, rewrite := range r.rewrites {
-		locationOld := location
-		location = rewrite.regex.ReplaceAllString(location, rewrite.replacement)
-		// some logging
-		fmt.Println("Changed location from ", locationOld, "to", location)
+		if (rewrite.regex.MatchString(location)) {
+			locationOld := location
+			location = rewrite.regex.ReplaceAllString(location, rewrite.replacement)
+			// some logging
+			fmt.Println("Changed location from ", locationOld, "to", location)
+		}
 	}
 
 	return location
@@ -155,25 +157,40 @@ func  (r *responseWriter) isFromIpv6() bool {
 
 
 func (r *responseWriter) WriteHeader(statusCode int) {
-	// only manipulate if redirect
-	if statusCode > 300 && statusCode < 400 {
-		// get header value
-		// as we are handling a redirect there should be one and only one location header
-		location := r.writer.Header().Get(locationHeader)
-
-		// default handling
-		if r.defaultHandlingEnabled {
-			location = r.defaultHandling(location)
-		}
+		oldURL := rawURL(req)
 
 		// rewrites
 		if r.isFromIpv6() && len(r.rewrites) > 0 {
-			location = r.handleRewrites(location)
+			newURL := r.handleRewrites(oldURL)
+			if (oldURL != newURL) {
+				r.writer.Header().Set(locationHeader, location)
+				statusCode = 301
+			}
 		}
 
-		r.writer.Header().Set(locationHeader, location)
-	}
-
+		
 	// call the wrapped writer
 	r.writer.WriteHeader(statusCode)
+}
+
+
+func rawURL(req *http.Request) string {
+	scheme := "http"
+	host := req.Host
+	port := ""
+	var uri string
+	if req.RequestURI != "" {
+		uri = req.RequestURI
+	} else if req.URL.RawPath == "" {
+		uri = req.URL.Path
+	} else {
+		uri = req.URL.RawPath
+	}
+
+
+	if req.TLS != nil {
+		scheme = "https"
+	}
+
+	return strings.Join([]string{scheme, "://", host, port, uri}, "")
 }
