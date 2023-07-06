@@ -144,10 +144,11 @@ func  (r *responseWriter) isFromIpv6() bool {
 			break
 		}
 	}
-
+	
 	if realIP == "" {
 		realIP = r.request.Header.Get(cfConnectingIP)
 	}
+	fmt.Println("realIP ", realIP)
 	return strings.Contains(realIP, ":")
 }
 
