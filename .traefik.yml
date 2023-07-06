@@ -1,6 +1,6 @@
 displayName: Modify redirect location
 type: middleware
-import: github.com/SchmitzDan/traefik-plugin-redirect-location
+import: github.com/init-object/traefik-plugin-redirect-ipv6
 
 summary: 'Modify the redirect location of the response'
 
