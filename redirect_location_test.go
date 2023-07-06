@@ -1,5 +1,5 @@
-// Package traefik_plugin_redirect_location is a traefik plugin fixing the location header in a redirect response
-package traefik_plugin_redirect_location //nolint
+// Package traefik_plugin_redirect_ipv6 is a traefik plugin fixing the location header in a redirect response
+package traefik_plugin_redirect_ipv6 //nolint
 import (
 	"context"
 	"net/http"
