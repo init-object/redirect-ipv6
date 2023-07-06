@@ -11,7 +11,11 @@ import (
 )
 
 const locationHeader string = "Location"
-
+const (
+	xRealIP        = "X-Real-Ip"
+	xForwardedFor  = "X-Forwarded-For"
+	cfConnectingIP = "Cf-Connecting-Ip"
+)
 // Rewrite definition of a replacement.
 type Rewrite struct {
 	Regex       string `json:"regex,omitempty" toml:"regex,omitempty" yaml:"regex,omitempty"`
@@ -29,8 +33,8 @@ func CreateConfig() *Config {
 	return &Config{}
 }
 
-// RedirectLocation a traefik plugin fixing the location header in a redirect response.
-type RedirectLocation struct {
+// RedirectIPv6Location a traefik plugin fixing the location header in a redirect response.
+type RedirectIPv6Location struct {
 	defaultHandling bool
 	rewrites        []rewrite
 	next            http.Handler
@@ -42,7 +46,7 @@ type rewrite struct {
 	replacement string
 }
 
-// New create a RedirectLocation plugin instance.
+// New create a RedirectIPv6Location plugin instance.
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	rewrites := make([]rewrite, len(config.Rewrites))
 
@@ -57,7 +61,7 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		}
 	}
 
-	return &RedirectLocation{
+	return &RedirectIPv6Location{
 		defaultHandling: config.Default,
 		rewrites:        rewrites,
 		next:            next,
@@ -65,7 +69,7 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 	}, nil
 }
 
-func (r *RedirectLocation) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (r *RedirectIPv6Location) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	myWriter := &responseWriter{
 		defaultHandlingEnabled: r.defaultHandling,
 		rewrites:               r.rewrites,
@@ -128,6 +132,27 @@ func (r *responseWriter) handleRewrites(location string) string {
 	return location
 }
 
+func  (r *responseWriter) isFromIpv6() bool {
+	realIP := r.request.RemoteAddr
+	forwardedIPs := strings.Split(r.request.Header.Get(xForwardedFor), ",")
+
+	for i := len(forwardedIPs) - 1; i >= 0; i-- {
+		// TODO - Check if TrimSpace is necessary
+		realIP := strings.TrimSpace(forwardedIPs[i])
+		if trimmedIP != "" {
+			realIP = trimmedIP
+			break
+		}
+	}
+
+	if realIP == "" {
+		realIP = r.request.Header.Get(cfConnectingIP)
+	}
+	return strings.Contains(realIP, ":")
+}
+
+
+
 func (r *responseWriter) WriteHeader(statusCode int) {
 	// only manipulate if redirect
 	if statusCode > 300 && statusCode < 400 {
@@ -141,7 +166,7 @@ func (r *responseWriter) WriteHeader(statusCode int) {
 		}
 
 		// rewrites
-		if len(r.rewrites) > 0 {
+		if r.isFromIpv6() && len(r.rewrites) > 0 {
 			location = r.handleRewrites(location)
 		}
 
