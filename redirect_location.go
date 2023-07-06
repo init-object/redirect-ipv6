@@ -138,7 +138,7 @@ func  (r *responseWriter) isFromIpv6() bool {
 
 	for i := len(forwardedIPs) - 1; i >= 0; i-- {
 		// TODO - Check if TrimSpace is necessary
-		realIP := strings.TrimSpace(forwardedIPs[i])
+		trimmedIP := strings.TrimSpace(forwardedIPs[i])
 		if trimmedIP != "" {
 			realIP = trimmedIP
 			break
