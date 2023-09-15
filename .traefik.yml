@@ -1,8 +1,8 @@
-displayName: Modify redirect location
+displayName: redirect v6 domain
 type: middleware
 import: github.com/init-object/traefik-plugin-redirect-ipv6
 
-summary: 'Modify the redirect location of the response'
+summary: 'Modify the redirect location to ipv6'
 
 testData:
   default: true
