@@ -98,7 +98,7 @@ func TestDefaultHandling(t *testing.T) {
 			desc:           "No forwarded Prefix and absolute path",
 			locationBefore: "http://host:815/path",
 			expLocation:    "http://host:815/path",
-		}
+		},
 	}
 
 	config := &Config{
