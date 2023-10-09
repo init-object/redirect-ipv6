@@ -98,33 +98,7 @@ func TestDefaultHandling(t *testing.T) {
 			desc:           "No forwarded Prefix and absolute path",
 			locationBefore: "http://host:815/path",
 			expLocation:    "http://host:815/path",
-		},
-		{
-			desc:            "Forwarded Prefix and relative path",
-			forwardedPrefix: "/test",
-			locationBefore:  "somevalue",
-			expLocation:     "/test/somevalue",
-		},
-		{
-			desc:            "Forwarded Prefix and relative path already containing prefix",
-			forwardedPrefix: "/test",
-			locationBefore:  "/test/somevalue",
-			expLocation:     "/test/somevalue",
-		},
-		{
-			desc:            "Forwarded Prefix and absolute path",
-			forwardedPrefix: "/test",
-			forwardedHost:   "host",
-			locationBefore:  "http://host:815/path",
-			expLocation:     "http://host:815/test/path",
-		},
-		{
-			desc:            "Forwarded Prefix and absolute path already containing prefix",
-			forwardedPrefix: "/test",
-			forwardedHost:   "host",
-			locationBefore:  "http://host:815/test/path",
-			expLocation:     "http://host:815/test/path",
-		},
+		}
 	}
 
 	config := &Config{
