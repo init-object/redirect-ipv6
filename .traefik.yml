@@ -1,6 +1,6 @@
 displayName: redirect v6 domain
 type: middleware
-import: github.com/init-object/traefik-plugin-redirect-ipv6
+import: github.com/init-object/redirect-ipv6
 
 summary: 'Modify the redirect location to ipv6'
 
