@@ -20,7 +20,7 @@ The plugin also supports the definition and handling of some rewrites. A rewrite
 experimental:
   plugins:
     redirectIPv6Location:
-      modulename: "github.com/init-object/traefik-plugin-redirect-ipv6"
+      modulename: "github.com/init-object/redirect-ipv6"
       version: "v0.0.1" #replace with newest version
 ```
 
